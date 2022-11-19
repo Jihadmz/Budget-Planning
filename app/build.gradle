@@ -21,8 +21,18 @@ android {
         }
     }
 
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword 'Jihad124@'
+            storeFile file('file.jks')
+            storePassword 'Jihad124@'
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.config
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

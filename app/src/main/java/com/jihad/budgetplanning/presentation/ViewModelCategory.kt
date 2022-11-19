@@ -1,7 +1,6 @@
 package com.jihad.budgetplanning.presentation
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jihad.budgetplanning.data.data_source.DatabaseCategories
@@ -16,6 +15,7 @@ import kotlinx.coroutines.launch
 class ViewModelCategory(context: Context): ViewModel() {
 
     private val daoCategory = DatabaseCategories.getInstance(context).dao()
+    var categoryTitle: String = ""
 
     private var _list: MutableStateFlow<MutableList<EntityCategory>> = MutableStateFlow(
         mutableListOf()
@@ -44,11 +44,11 @@ class ViewModelCategory(context: Context): ViewModel() {
     }
 
 
+
+
     fun addCategory(category: EntityCategory){
         viewModelScope.launch(Dispatchers.IO){
             daoCategory.addCategory(category = category)
-        }
-        viewModelScope.launch(Dispatchers.IO){
             _list.value = daoCategory.getAllCategories()
         }
     }
@@ -56,8 +56,6 @@ class ViewModelCategory(context: Context): ViewModel() {
     fun addPurchase(purchase: EntityPurchase){
         viewModelScope.launch(Dispatchers.IO){
             daoCategory.addPurchase(purchase)
-        }
-        viewModelScope.launch(Dispatchers.IO){
             _purchases.value = daoCategory.getAllPurchases()
         }
     }
@@ -68,6 +66,24 @@ class ViewModelCategory(context: Context): ViewModel() {
 
     fun change(total: String){
         _total.value = total
+    }
+
+    fun deleteCategory(category: EntityCategory){
+        viewModelScope.launch(Dispatchers.IO) {
+            daoCategory.deleteCategory(category)
+            _purchases.value.filter { it.category == category.label }.forEach{
+                daoCategory.deletePurchase(it)
+            }
+            _list.value = daoCategory.getAllCategories()
+            _purchases.value = daoCategory.getAllPurchases()
+        }
+    }
+
+    fun deletePurchase(purchase: EntityPurchase){
+        viewModelScope.launch(Dispatchers.IO) {
+            daoCategory.deletePurchase(purchase)
+            _purchases.value = daoCategory.getAllPurchases()
+        }
     }
 
 }

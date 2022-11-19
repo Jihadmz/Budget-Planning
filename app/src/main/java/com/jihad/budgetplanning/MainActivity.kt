@@ -3,30 +3,23 @@ package com.jihad.budgetplanning
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Absolute.Center
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
-import com.jihad.budgetplanning.domain.models.EntityCategory
-import com.jihad.budgetplanning.domain.models.EntityPurchase
 import com.jihad.budgetplanning.presentation.ViewModelCategory
-import com.jihad.budgetplanning.presentation.components.AnimatedComponent
-import com.jihad.budgetplanning.presentation.components.ListItemCategory
-import com.jihad.budgetplanning.presentation.components.ListItemPurchase
-import com.jihad.budgetplanning.presentation.components.MyDialog
+import com.jihad.budgetplanning.presentation.components.*
 import com.jihad.budgetplanning.ui.theme.BudgetPlanningTheme
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -34,6 +27,9 @@ class MainActivity : ComponentActivity() {
             val list = viewModelCategory.list.collectAsState()
             val purchases = viewModelCategory.purchases.collectAsState()
             val openDialog = remember {
+                mutableStateOf(false)
+            }
+            val openPurchaseDialog = remember {
                 mutableStateOf(false)
             }
 
@@ -47,16 +43,30 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.fillMaxSize()) {
 
                         if (openDialog.value)
-                            MyDialog(viewModelCategory = viewModelCategory, onDismissListener = {
-                                openDialog.value = false
-                            })
-                        Button(onClick = {
-                            openDialog.value = true
-                        }) {
-                            Text(text = "add")
+                            DialogAddCategory(viewModelCategory = viewModelCategory) {
+                                openDialog.value = !openDialog.value
+                            }
+
+                        if (openPurchaseDialog.value) {
+                            DialogAddPurchase(
+                                viewModelCategory = viewModelCategory,
+                                onDismissListener = {
+                                    openPurchaseDialog.value = !openPurchaseDialog.value
+                                }
+                            )
                         }
 
-                        LazyColumn {
+                        Button(
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+                            onClick = {
+                                openDialog.value = true
+                            }) {
+                            Text(text = "Add Category")
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(
                                 count = list.value.size,
                                 key = { list.value[it].id }
@@ -66,7 +76,11 @@ class MainActivity : ComponentActivity() {
                                     mutableStateOf(false)
                                 }
 
-                                Column(modifier = Modifier.fillMaxSize()) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .animateItemPlacement()
+                                ) {
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -76,15 +90,12 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier,
                                             category = list.value[index],
                                             addPurchase = {
-                                                viewModelCategory.addPurchase(
-                                                    EntityPurchase(
-                                                        label = "banana",
-                                                        category = list.value[index].label,
-                                                        purchaseAmount = 200
-                                                    )
-                                                )
+                                                openPurchaseDialog.value = !openPurchaseDialog.value
+                                                viewModelCategory.categoryTitle =
+                                                    list.value[index].label
                                             },
-                                            visibility = visibility
+                                            visibility = visibility,
+                                            viewModelCategory = viewModelCategory
                                         )
                                     }
 
@@ -96,27 +107,30 @@ class MainActivity : ComponentActivity() {
                                     AnimatedComponent(
                                         modifier = Modifier,
                                         content = {
-                                            Column(modifier = Modifier.fillMaxWidth()) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
                                                 purchasesMy.forEach {
                                                     Row(
-                                                        modifier = Modifier.fillMaxWidth(),
+                                                        modifier = Modifier.fillMaxWidth().animateItemPlacement(),
                                                         horizontalArrangement = Arrangement.Center
                                                     ) {
                                                         ListItemPurchase(
                                                             modifier = Modifier.fillMaxWidth(0.8f),
-                                                            purchase = it
+                                                            purchase = it,
+                                                            viewModelCategory = viewModelCategory
                                                         )
                                                     }
                                                     Spacer(modifier = Modifier.height(5.dp))
                                                 }
-                                            }
-                                        },
+                                        }
+                                            },
                                         visibility = visibility.value
                                     )
                                 }
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                }
                             }
                         }
-                    }
                 }
             }
         }
