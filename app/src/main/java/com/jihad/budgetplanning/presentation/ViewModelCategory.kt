@@ -27,6 +27,12 @@ class ViewModelCategory(context: Context): ViewModel() {
     )
     val purchases: StateFlow<List<EntityPurchase>> = _purchases.asStateFlow()
 
+    private var _category: MutableStateFlow<String> = MutableStateFlow("")
+    val category: StateFlow<String> = _category.asStateFlow()
+
+    private var _total: MutableStateFlow<String> = MutableStateFlow("")
+    val total: StateFlow<String> = _total.asStateFlow()
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _list.value = daoCategory.getAllCategories()
@@ -54,6 +60,14 @@ class ViewModelCategory(context: Context): ViewModel() {
         viewModelScope.launch(Dispatchers.IO){
             _purchases.value = daoCategory.getAllPurchases()
         }
+    }
+
+    fun changeCategory(text: String){
+        _category.value = text
+    }
+
+    fun change(total: String){
+        _total.value = total
     }
 
 }

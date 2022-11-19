@@ -23,6 +23,7 @@ import com.jihad.budgetplanning.presentation.ViewModelCategory
 import com.jihad.budgetplanning.presentation.components.AnimatedComponent
 import com.jihad.budgetplanning.presentation.components.ListItemCategory
 import com.jihad.budgetplanning.presentation.components.ListItemPurchase
+import com.jihad.budgetplanning.presentation.components.MyDialog
 import com.jihad.budgetplanning.ui.theme.BudgetPlanningTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,6 +33,9 @@ class MainActivity : ComponentActivity() {
             val viewModelCategory = ViewModelCategory(this)
             val list = viewModelCategory.list.collectAsState()
             val purchases = viewModelCategory.purchases.collectAsState()
+            val openDialog = remember {
+                mutableStateOf(false)
+            }
 
             BudgetPlanningTheme {
                 // A surface container using the 'background' color from the theme
@@ -41,13 +45,13 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     Column(modifier = Modifier.fillMaxSize()) {
+
+                        if (openDialog.value)
+                            MyDialog(viewModelCategory = viewModelCategory, onDismissListener = {
+                                openDialog.value = false
+                            })
                         Button(onClick = {
-                            viewModelCategory.addCategory(
-                                EntityCategory(
-                                    label = "jihadmz",
-                                    total = 1200
-                                )
-                            )
+                            openDialog.value = true
                         }) {
                             Text(text = "add")
                         }
