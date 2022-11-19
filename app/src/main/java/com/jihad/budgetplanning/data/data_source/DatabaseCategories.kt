@@ -6,8 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.jihad.budgetplanning.data.repository.DaoCategories
 import com.jihad.budgetplanning.domain.models.EntityCategory
+import com.jihad.budgetplanning.domain.models.EntityPurchase
 
-@Database(entities = arrayOf(EntityCategory::class), version = 1)
+@Database(entities = [EntityCategory::class, EntityPurchase::class], version = 1)
 abstract class DatabaseCategories : RoomDatabase() {
 
     abstract fun dao(): DaoCategories
