@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class EntityCategory(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var label: String,
-    var total: Int
+    var total: Int = 0,
+    val date: String
 )

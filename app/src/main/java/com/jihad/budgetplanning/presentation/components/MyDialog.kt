@@ -12,7 +12,11 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.jihad.budgetplanning.Util
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.util.*
+import kotlin.concurrent.timerTask
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -23,13 +27,11 @@ fun MyDialog(
     keyboardController: SoftwareKeyboardController
 ) {
 
-//    LaunchedEffect(key1 = true, block = {
-//        Util.requestFocus(focusRequester, keyboardController)
-//    })
-//    Timer().schedule(timerTask {
-//        runBlocking(Dispatchers.Main) {
-//        }
-//    }, 500)
+    Timer().schedule(timerTask {
+        runBlocking(Dispatchers.Main) {
+        Util.requestFocus(focusRequester, keyboardController)
+        }
+    }, 500)
 
     Dialog(
         onDismissRequest = {
@@ -40,7 +42,7 @@ fun MyDialog(
         Column(
             modifier = Modifier
                 .wrapContentSize()
-                .background(color = Color.Blue, shape = RoundedCornerShape(10.dp))
+                .background(color = Color.White, shape = RoundedCornerShape(10.dp))
         ) {
             content()
         }

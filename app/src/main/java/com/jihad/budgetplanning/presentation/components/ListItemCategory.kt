@@ -1,5 +1,7 @@
 package com.jihad.budgetplanning.presentation.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,7 +19,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.jihad.budgetplanning.domain.models.EntityCategory
 import com.jihad.budgetplanning.presentation.ViewModelCategory
+import com.jihad.budgetplanning.ui.theme.LightOrange
+import com.jihad.budgetplanning.ui.theme.LightRed
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ListItemCategory(
     modifier: Modifier,
@@ -28,52 +33,47 @@ fun ListItemCategory(
 ) {
 
     val icon: ImageVector = if (visibility.value)
-        Icons.Default.ExpandLess
+        Icons.Filled.ExpandLess
     else
-        Icons.Default.ExpandMore
+        Icons.Filled.ExpandMore
 
-    Column(
+    Row(
         modifier = modifier
-            .fillMaxWidth(0.9f)
-            .fillMaxHeight()
+            .fillMaxWidth()
+            .background(color = LightOrange, shape = RoundedCornerShape(8.dp))
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        Row(modifier = Modifier.fillMaxWidth()
-            .background(color = Color.Blue, shape = RoundedCornerShape(8.dp))
-        ) {
+        Text(modifier = Modifier.weight(1f), text = category.label)
+        Icon(
+            modifier = Modifier.weight(1f),
+            imageVector = Icons.Default.ArrowForward,
+            contentDescription = "Arrow"
+        )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+        // animating category total amount component
+        AnimatedContent(modifier = Modifier.weight(1f), targetState = category.total) {
+            Text(text = "${category.total} L.L", color = if (category.total > 1700000) LightRed else Color.White)
+        }
 
-            ) {
-                Text(text = category.label)
-                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Arrow")
-                Text(text = "${category.total} L.L")
-            }
+        IconButton(modifier = Modifier.weight(1f), onClick = {
+            addPurchase()
+        }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+        }
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = {
-                    addPurchase()
-                }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "add")
-                }
+        IconButton(modifier = Modifier.weight(1f), onClick = {
+            visibility.value = !visibility.value
+        }) {
+            Icon(imageVector = icon, contentDescription = "expand")
+        }
 
-                IconButton(onClick = {
-                    visibility.value = !visibility.value
-                }) {
-                    Icon(imageVector = icon, contentDescription = "expand")
-                }
-
-                IconButton(onClick = {
-                    viewModelCategory.deleteCategory(category)
-                }) {
-                    Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
-                }
-            }
+        IconButton(modifier = Modifier.weight(1f), onClick = {
+            viewModelCategory.deleteCategory(category)
+        }) {
+            Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
         }
     }
 }

@@ -2,10 +2,9 @@ package com.jihad.budgetplanning.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -15,6 +14,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.jihad.budgetplanning.Util
 import com.jihad.budgetplanning.domain.models.EntityCategory
 import com.jihad.budgetplanning.presentation.ViewModelCategory
 
@@ -33,6 +33,10 @@ fun DialogAddCategory(
     }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val categoryError = remember {
+        mutableStateOf(false)
+    }
+
     MyDialog(
         onDismissListener = { onDismissListener() },
         content = {
@@ -45,7 +49,8 @@ fun DialogAddCategory(
                     onTextChange = {
                         viewModelCategory.changeCategory(it)
                     },
-                    placeholder = "Category"
+                    placeholder = "Category",
+                    isError = categoryError.value
                 )
 
                 Spacer(modifier = Modifier.height(5.dp))
@@ -61,7 +66,7 @@ fun DialogAddCategory(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Button(
+                MyButton(
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .align(alignment = Alignment.CenterHorizontally), onClick = {
@@ -69,14 +74,12 @@ fun DialogAddCategory(
                         viewModelCategory.addCategory(
                             EntityCategory(
                                 label = categoryText.value,
-                                total = categoryTotal.value.toInt()
+                                date = Util.getDate()
                             )
                         )
                         viewModelCategory.changeCategory("")
                         viewModelCategory.change("")
-                    }) {
-                    Text(text = "Save")
-                }
+                    }, text = "Add")
             }
         },
         focusRequester = focusRequester,
