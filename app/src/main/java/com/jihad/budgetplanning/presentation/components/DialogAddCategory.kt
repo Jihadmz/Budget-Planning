@@ -14,7 +14,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.jihad.budgetplanning.Util
+import com.jihad.budgetplanning.Variables
 import com.jihad.budgetplanning.domain.models.EntityCategory
 import com.jihad.budgetplanning.presentation.ViewModelCategory
 
@@ -74,7 +74,7 @@ fun DialogAddCategory(
                         viewModelCategory.addCategory(
                             EntityCategory(
                                 label = categoryText.value,
-                                date = Util.getDate()
+                                date = Variables.dateToAddACategory
                             )
                         )
                         viewModelCategory.changeCategory("")

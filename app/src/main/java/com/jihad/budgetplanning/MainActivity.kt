@@ -74,10 +74,13 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier.fillMaxWidth(0.95f),
                                             date = dates.value[index],
                                             addCategory = {
+                                                Variables.dateToAddACategory = dates.value[index].date
                                                 openDialog.value = true
                                             }) {
 
-                                            list.value.forEach { category ->
+                                            val categories = list.value.filter { it.date == dates.value[index].date }
+
+                                            categories.forEach { category ->
                                                 val visibility = remember {
                                                     mutableStateOf(false)
                                                 }
